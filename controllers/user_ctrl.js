@@ -1,6 +1,9 @@
 var models = require('../models/index');
 var User = models.User;
 var async = require('async');
+var RedisPool = require('./common/redispool');
+var pool = RedisPool();
+var redis = require('redis');
 
 exports.savename = function(req, res) {
 	var obj = req.query;
@@ -55,3 +58,21 @@ exports.innerRedirect = function (req, res) {
 exports.google = function (req, res) {
 	res.redirect(301, 'https://www.google.com.tw');
 };
+
+
+exports.getMessage = function (req, res) {
+	var obj = req.query;
+	if (obj) {
+		var uid = obj.uid;
+		var client = createRedisClient(uid);
+	}
+};
+
+function createRedisClient(uid) {
+	var client = redis.createClient();
+	client.on('message', function (channel, message) {
+		if (channel && message) {
+			return client;
+		}
+	});
+}
